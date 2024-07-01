@@ -1,54 +1,75 @@
 #include<stdio.h>
 #include<string.h>
+
 struct MenuItem {
-    char name[50];
-    float price;
+    char name[50];
+    float price;
 };
+
 void displayMenu(struct MenuItem menu[], int itemCount) {
-    printf("Menu:\n");
-    for (int i = 0; i < itemCount; i++) {
-        printf("%d. %s - $%.2f\n", i + 1, menu[i].name, menu[i].price);
-    }
+    printf("Menu:\n");
+    for (int i = 0; i < itemCount; i++) {
+        printf("%d. %s - $%.2f\n", i + 1, menu[i].name, menu[i].price);
+    }
 }
+
 int main() {
-    int itemCount;
-    printf("Enter the number of items on the menu: ");
-    scanf("%d", &itemCount);
+    int itemCount;
+    printf("Enter the number of items on the menu: ");
+    if (scanf("%d", &itemCount) != 1 || itemCount <= 0) {
+        printf("Invalid input. Please enter a valid number of items.\n");
+        return 1;
+    }
 
-    struct MenuItem menu[itemCount];
-    int order[itemCount];
-   
-    for (int i = 0; i < itemCount; i++) {
-        printf("Enter the name of item %d: ", i + 1);
-        scanf(" %[^\n]s", menu[i].name);
-        printf("Enter the price of %s: $", menu[i].name);
-        scanf("%f", &menu[i].price);
-        order[i] = 0;
-    }
-    float totalBill = 0;
-    displayMenu(menu, itemCount);
-    int choice;
-    do {
-        printf("Enter the item number you want to order (0 to finish ordering): ");
-        scanf("%d", &choice);
+    struct MenuItem menu[itemCount];
+    int order[itemCount];
 
-        if (choice >= 1 && choice <= itemCount) {
-            int quantity;
-            printf("Enter the quantity of %s: ", menu[choice - 1].name);
-            scanf("%d", &quantity);
-            order[choice - 1] += quantity;
-            totalBill += menu[choice - 1].price * quantity;
-        } else if (choice != 0) {
-            printf("Invalid choice. Please enter a valid item number.\n");
-        }
-    } while (choice != 0);
+    for (int i = 0; i < itemCount; i++) {
+        printf("Enter the name of item %d: ", i + 1);
+        scanf(" %[^\n]", menu[i].name);
 
-    printf("\nReceipt:\n");
-    for (int i = 0; i < itemCount; i++) {
-        if (order[i] > 0) {
-            printf("%s (x%d) - $%.2f\n", menu[i].name, order[i], menu[i].price * order[i]);
-        }
-    }
-    printf("Total Bill: $%.2f\n", totalBill);
-return 0;
+        printf("Enter the price of %s: $", menu[i].name);
+        if (scanf("%f", &menu[i].price) != 1 || menu[i].price <= 0) {
+            printf("Invalid price entered for %s. Please enter a valid price.\n", menu[i].name);
+            return 1;
+        }
+
+        order[i] = 0; // Initialize order quantities to zero
+    }
+
+    float totalBill = 0;
+    displayMenu(menu, itemCount);
+    int choice;
+    do {
+        printf("Enter the item number you want to order (0 to finish ordering): ");
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a valid item number.\n");
+            choice = -1; // Reset choice to force re-entry of correct input
+            continue;
+        }
+
+        if (choice >= 1 && choice <= itemCount) {
+            int quantity;
+            printf("Enter the quantity of %s: ", menu[choice - 1].name);
+            if (scanf("%d", &quantity) != 1 || quantity <= 0) {
+                printf("Invalid quantity entered. Please enter a valid quantity.\n");
+                continue;
+            }
+
+            order[choice - 1] += quantity;
+            totalBill += menu[choice - 1].price * quantity;
+        } else if (choice != 0) {
+            printf("Invalid choice. Please enter a valid item number.\n");
+        }
+    } while (choice != 0);
+
+    printf("\nReceipt:\n");
+    for (int i = 0; i < itemCount; i++) {
+        if (order[i] > 0) {
+            printf("%s (x%d) - $%.2f\n", menu[i].name, order[i], menu[i].price * order[i]);
+        }
+    }
+    printf("Total Bill: $%.2f\n", totalBill);
+
+    return 0;
 }
